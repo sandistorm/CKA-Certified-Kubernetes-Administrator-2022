@@ -9,6 +9,7 @@ _**DaemonSet**_
 
 _Create a new ServiceAccount named **cicd-token** in the existing namespace **app-team1**. Bind the new ClusterRole **deployment-clusterrole** to the new ServiceAccount **cicd-token** , limit to the namespace **app-team1**_
 
+# Answer
 first, you should create a service account named **cicd-token** in a **app-team1** namespace
 
 `# kubectl create serviceaccount cicd-token --namespace=app-team1`
@@ -22,15 +23,16 @@ finally, you can bind the clusterrole to the service account
 `# kubectl create rolebinding deployment-clusterrole --clusterrole=deployment-clusterrole --serviceaccount=app-team1:cicd-token --namespace=app-team1`
 ***
 
-
 _2. Set the node labelled with name=**ek8s-node-1** as unavailable and reschedule all the pods running on it._
 
+# Answer
 `# kubectl drain ek8s-node-1 --delete-local-data --ignore-daemonsets --force`
 ***
 
 
 _3. Given an existing Kubernetes cluster running version **1.21.1**, upgrade all of the Kubernetes control plan and node components on the master node only to version **1.21.2**. You are also expected to upgrade kubelet and kubectl on the **master node**._
 
+# Answer
 * Upgrade kubeadm:
 
 `# apt-mark unhold kubeadm && apt-get update && apt-get install -y kubeadm=1.21.2-00 && apt-mark hold kubeadm`
@@ -61,6 +63,7 @@ _The following TLS certificates/key are supplied for connecting to the server wi
 
 _CA certificate: **/opt/KUIN00601/ca.crt** Client certificate: **/opt/KUIN00601/etcd-client.crt** Clientkey:**/opt/KUIN00601/etcd-client.key**_
 
+# Answer
 * backup from etcd:
 
 `# ETCDCTL_API=3 etcdctl --endpoints="https://127.0.0.1:2379" --cacert=/opt/KUIN000601/ca.crt --cert=/opt/KUIN000601/etcd-client.crt --key=/opt/KUIN000601/etcd-client.key snapshot save /etc/data/etcd-snapshot.db`
@@ -77,6 +80,7 @@ _* does not allow access to Pods not listening on port 9000_
 
 _* does not allow access from Pods not in namespace internal_
 
+# Answer
 * First, you should search "NetworkPolicy" in the kubernetes.io document and then copy the first NetworkPolicy YAML file and then delete unused lines, finally, the below YAML file will remain:
 
 `# vim networkpol.yaml`
@@ -111,6 +115,7 @@ _Create a new service named **front-end-svc** exposing the container port http._
 
 _Configure the new service to also expose the individual Pods via a **NodePort** on the nodes on which they are scheduled_
 
+# Answer
 `# kubectl expose deployment front-end --name=front-end-svc --port=80 --target-port=80 --type=NodePort`
 ***
 
@@ -125,7 +130,7 @@ _7. Create a new nginx **Ingress** resource as follows:_
 
 _Answer: curl -kL <INTERNAL_IP>/hi_
 
-
+# Answer
 * First, you should search "Ingress" in the kubernetes.io document and then copy the "A minimal Ingress resource example:" and then change the required line according to the question Ingress.yaml:
 ```YAML
 apiVersion: networking.k8s.io/v1
@@ -155,6 +160,7 @@ spec:
 
 _8. Scale the deployment **loadbalancer** to **6** pods._
 
+# Answer
 `# kubectl scale deploy loadbalancer --replicas=6`
 ***
 
@@ -165,6 +171,7 @@ _9. Schedule a pod as follow:_
 * _Image: **nginx**_
 * _Node selector: **disk=spinning**_
 
+# Answer
 * First, you should search "nodeselector" in the kubernetes.io document and then copy or download the "https://k8s.io/examples/pods/pod-nginx.yaml" and then change the required line according to the question:
 
 ```YAML
@@ -189,6 +196,7 @@ spec:
 
 _10. Check to see how many nodes are **ready** (not including nodes **tainted** **NoSchedule**) and write the number to **/opt/kubernetes/nodenum**_
 
+# Answer
 `# kubectl describe nodes |grep Taint |grep -v NoSchedule |wc -l >/opt/kubernetes/nodenum`
 ***
 
@@ -197,6 +205,7 @@ _11. Create a pod named kucc4 with a single container for each of the following 
 * _Image: **redis**_
 * _Image: **consul**_
 
+# Answer
 * First, you can create a simple pod with kubectl command:
 `kubectl run kucc4 --image=redis –dry-run=client -o yaml >multipod.yaml`
 
@@ -220,6 +229,7 @@ spec:
 
 _12. Creae a persistent volume with name **app-config** of capacity **1Gi** and access mode **ReadWriteOnce**. The type of volume is **hostPath** and its location is **/srv/app-config**_
 
+# Answer
 * First, you should search "Configure a Pod to Use a PersistentVolume" in kubernetes.io Documentation and then copy the "https://k8s.io/examples/pods/storage/pv-volume.yaml" and then edit the yaml file as well
 ```YAML
 apiVersion: v1
@@ -251,6 +261,7 @@ _13. Create a new PVC:_
 * _Image: nginx_
 * _Mount path: **/usr/share/nginx/html** Configure the new Pod to have **ReadWriteOnce** access on the volume. Finally, using **kubectl edit** or **kubectl path** expand the PVC to a capacity **70Mi** and record that change._
 
+# Answer
 * first, you can check storageclass with "kubectl get sc" and you will see "csi-hostpath-sc" at the output, Then you can create a pvc with sample pvc  "https://k8s.io/examples/pods/storage/pv-claim.yaml" in kubernetes.io documentation, finally you can edit the sample file as well as below:
 ```YAML
 apiVersion: v1
@@ -292,7 +303,7 @@ _14. Monitor the logs of pod **loadbalancer** and:_
 
 * _Extract log lines corrsponding to **Error unable-to-access-website**_
 * _Write them to **/opt/KUTR00101/loadbalancer**_
-
+# Answer
 `kubectl logs loadbalancer |grep Error |grep unable-to-access-website > /opt/KUTR00101/loadbalancer`
 ***
 
@@ -307,6 +318,7 @@ _Use a volume mount named logs to make the file **/var/log/legacy-app.log** avai
 
 * _Don’t modify the path of the log file, both containers must access it at **/var/log/legacy-app.log**._
 
+# Answer
 First you should get pod with "`kubectl get pod legacy-app -o yaml >legacy-app.yaml`" then you should edit yaml file as shown below and finally apply the change by "`kubectl apply -f legacy-app.yaml`"
 ```YAML
 apiVersion: v1
@@ -346,12 +358,14 @@ spec:
 
 _16. From the pod label **name=app**,find pods running **high CPU** workloads and write the **name of the pod consuming most CPU** to the fule **/opt/KUT00401/KUT0001.txt** (which already exists)._
 
+# Answer
 `# kubectl top pod --sort-by=cpu --selector name=app |head -2 |tail -1 |cut-d' ' -f1 >/opt/KUT00401/KUT0001.txt`
 ***
 
 
 _17. A Kubernetes worker node, named **wk8s-node-0** is in state **NotReady**. Investigate why this is the case, and perform any appropriate steps to bring the node to a Ready state, ensuring that any changes are made **permanent**._
 
+# Answer
 * First, you should go to the wk8s-node-0 node with "`ssh wk8s-node-0`" and then switch to root user with "`sudo -i`", then you can run "`kubectl get node`" and after that, you can test the kubelet service with "`systemctl status kubelet.service`" finally you will find that kubelet is stoped and all you need is start and enable kubelet as shown below:
 
 `# systemctl start kubelet.service`
